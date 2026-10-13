@@ -1,0 +1,1071 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1b1c28">
+<title>Zuno</title>
+<style>
+:root{
+  --bg0:#1b1c28; --bg1:#222434; --bg2:#292b3d; --bg3:#34374d; --line:#363951;
+  --text:#e7e9f4; --muted:#9a9fba; --accent:#6d7cff; --accent2:#5967e8;
+  --green:#3ecf8e; --danger:#f0616d; --radius:10px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--bg2);color:var(--text);
+  font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.hidden{display:none!important}
+.grow{flex:1}
+
+/* ---------- telas de configuração e login ---------- */
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(1200px 600px at 20% -10%,#323665 0,transparent 60%),var(--bg0);overflow:auto}
+.panel{width:100%;max-width:400px;background:var(--bg1);border:1px solid var(--line);border-radius:16px;padding:26px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--accent),#a06cf0);
+  display:grid;place-items:center;font-weight:800;font-size:26px;margin:0 auto 14px}
+.panel h2{margin:0 0 4px;text-align:center;font-size:22px}
+.panel .sub{margin:0 0 18px;text-align:center;color:var(--muted);font-size:14px}
+label.f{display:block;margin:12px 0 5px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+input,textarea{width:100%;background:var(--bg0);border:1px solid var(--line);border-radius:8px;padding:11px 12px;outline:none}
+input:focus,textarea:focus{border-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:8px;
+  background:var(--bg3);font-weight:600}
+.btn:hover{filter:brightness(1.12)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.block{width:100%;margin-top:16px}
+.btn:disabled{opacity:.55;cursor:default}
+.tabs{display:flex;gap:6px;background:var(--bg0);padding:4px;border-radius:10px;margin-bottom:6px}
+.tabs button{flex:1;padding:8px;border-radius:7px;color:var(--muted);font-weight:600}
+.tabs button.on{background:var(--bg3);color:var(--text)}
+.err{margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(240,97,109,.12);color:#ffb3b9;font-size:14px}
+.ok{margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(62,207,142,.12);color:#9be8c4;font-size:14px}
+.link{color:var(--muted);font-size:13px;text-decoration:underline;display:block;text-align:center;margin-top:14px}
+.help{font-size:13px;color:var(--muted);margin:14px 0 0;padding-left:18px}
+.help li{margin:4px 0}
+code{background:var(--bg0);padding:1px 5px;border-radius:5px;font-size:.92em}
+
+/* ---------- app ---------- */
+#app{display:flex;height:100vh;height:100dvh;background:var(--bg2)}
+#nav{display:flex;flex:none}
+#rail{width:72px;background:var(--bg0);display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 0;overflow-y:auto;scrollbar-width:none}
+#rail::-webkit-scrollbar{display:none}
+.rail-btn{position:relative;width:48px;height:48px;flex:none;border-radius:50%;background:var(--bg2);color:var(--text);
+  font-weight:700;display:grid;place-items:center;transition:border-radius .15s,background .15s}
+.rail-btn:hover,.rail-btn.active{border-radius:16px;background:var(--accent);color:#fff}
+.rail-btn.add{color:var(--green);font-size:24px}
+.rail-btn.add:hover{background:var(--green);color:#10281d}
+.rail-btn.active::before{content:"";position:absolute;left:-12px;top:10px;bottom:10px;width:4px;border-radius:0 4px 4px 0;background:#fff}
+.rail-sep{width:32px;height:2px;border-radius:2px;background:var(--line);flex:none}
+#side{width:240px;background:var(--bg1);display:flex;flex-direction:column;min-height:0}
+#sideHead{height:52px;flex:none;display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 14px;font-weight:700}
+#srvBtn{display:flex;align-items:center;justify-content:space-between;width:100%;font-weight:700;text-align:left}
+#srvBtn span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sideList{flex:1;overflow-y:auto;padding:10px 8px}
+.sec{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;font-size:11px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sec button{color:var(--muted);font-size:18px;line-height:1;padding:0 4px}
+.sec button:hover{color:var(--text)}
+.row{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;color:var(--muted);cursor:pointer;min-height:36px}
+.row:hover{background:var(--bg2);color:var(--text)}
+.row.active{background:var(--bg3);color:var(--text)}
+.row .hash{font-size:19px;opacity:.7;width:20px;text-align:center}
+.row .rn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .rowx{opacity:0;color:var(--muted);font-size:18px;padding:0 4px}
+.row:hover .rowx{opacity:1}
+.row .rowx:hover{color:var(--danger)}
+@media (hover:none){.row .rowx{opacity:.6}}
+.empty-side{padding:14px 10px;color:var(--muted);font-size:13px}
+#me{flex:none;display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg0)}
+#me .who{flex:1;min-width:0}
+#me .who b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+#me .who small{color:var(--green);font-size:12px}
+.icon{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:var(--muted);font-size:18px;flex:none}
+.icon:hover{background:var(--bg3);color:var(--text)}
+
+.avatar{position:relative;width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;
+  font-weight:700;color:#fff;font-size:17px;user-select:none}
+.avatar.sm{width:32px;height:32px;font-size:14px}
+.avatar .dot{position:absolute;right:-3px;bottom:-3px;width:10px;height:10px;border-radius:50%;
+  background:#6b6f88;border:3px solid var(--bg1);box-sizing:content-box}
+.avatar .dot.on{background:var(--green)}
+
+#main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+#top{height:52px;flex:none;display:flex;align-items:center;gap:8px;padding:0 10px 0 14px;border-bottom:1px solid var(--line);background:var(--bg2)}
+#top h1{margin:0;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#chIcon{font-size:22px;color:var(--muted)}
+#btnNav{display:none}
+#feed{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px 0 12px}
+.msg{display:flex;gap:12px;padding:2px 16px;position:relative}
+.msg:not(.cont){margin-top:14px}
+.msg:hover{background:rgba(255,255,255,.03)}
+.msg .body{min-width:0;flex:1}
+.meta{display:flex;align-items:baseline;gap:8px}
+.meta .name{font-weight:700}
+.meta time,.gutter-time{font-size:11px;color:var(--muted)}
+.gutter-time{width:40px;flex:none;text-align:center;opacity:0;align-self:center}
+.msg:hover .gutter-time{opacity:1}
+.text{white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+.text a{color:#8fa0ff}
+.text code{background:var(--bg0)}
+.text pre{white-space:pre-wrap;background:var(--bg0);border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:4px 0;overflow:auto}
+.text pre code{padding:0;background:none}
+.edited{font-size:11px;color:var(--muted)}
+.actions{position:absolute;right:12px;top:-16px;display:none;background:var(--bg1);border:1px solid var(--line);border-radius:8px;overflow:hidden;z-index:2}
+.msg:hover .actions,.msg.sel .actions{display:flex}
+.actions button{padding:6px 10px;color:var(--muted)}
+.actions button:hover{background:var(--bg3);color:var(--text)}
+.edit{min-height:60px;resize:vertical}
+.edit-bar{display:flex;gap:8px;margin-top:6px}
+.edit-bar .btn{padding:6px 12px;font-size:13px}
+.daysep{display:flex;align-items:center;gap:10px;margin:18px 16px 6px;color:var(--muted);font-size:12px;font-weight:600}
+.daysep::before,.daysep::after{content:"";flex:1;height:1px;background:var(--line)}
+.more{display:block;margin:6px auto 0;padding:8px 14px;border-radius:8px;background:var(--bg3);color:var(--muted);font-size:13px}
+.empty,.loading{padding:40px 24px;color:var(--muted);text-align:center}
+.empty h3{margin:0 0 6px;color:var(--text);font-size:20px}
+#jump{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);padding:8px 14px;border-radius:20px;
+  background:var(--accent);color:#fff;font-weight:600;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.4);z-index:3}
+#composer{flex:none;display:flex;align-items:flex-end;gap:6px;margin:0 14px 14px;padding:6px;background:var(--bg3);border-radius:12px}
+#composer textarea{background:transparent;border:0;resize:none;max-height:140px;padding:9px 6px;line-height:1.35}
+#composer .icon{height:38px}
+#btnSend{background:var(--accent);color:#fff;width:40px;height:38px;border-radius:8px;display:grid;place-items:center;flex:none}
+#btnSend:hover{background:var(--accent2)}
+#emojiPop{position:absolute;left:14px;bottom:68px;width:min(300px,calc(100% - 28px));display:grid;grid-template-columns:repeat(6,1fr);
+  gap:2px;padding:8px;background:var(--bg1);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:5}
+#emojiPop button{font-size:24px;padding:6px;border-radius:8px}
+#emojiPop button:hover{background:var(--bg3)}
+
+#members{width:240px;flex:none;background:var(--bg1);overflow-y:auto;padding:12px 8px}
+#members.collapsed{display:none}
+#app.home #members,#app.home #btnMembers{display:none}
+.mrow{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.mrow:hover{background:var(--bg2)}
+.mrow.off{opacity:.5}
+.mrow .mn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.mrow small{color:var(--muted);font-weight:400}
+
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:none}
+#scrim.on{display:block}
+
+#modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+#modalCard{width:100%;max-width:420px;max-height:90vh;overflow:auto;background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:20px}
+#modalCard h2{margin:0 0 12px;font-size:19px}
+#modalCard h3{margin:14px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.or{margin:16px 0 0;text-align:center;color:var(--muted);font-size:13px}
+.line{display:flex;gap:8px;margin-top:8px}
+.line input{flex:1}
+.swatches{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.sw{width:32px;height:32px;border-radius:50%;border:3px solid transparent}
+.sw.on{border-color:#fff}
+.stack{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.center{text-align:center}
+.center .avatar{margin:0 auto 10px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+  background:#0f1019;border:1px solid var(--line);padding:10px 16px;border-radius:10px;z-index:60;max-width:90vw;
+  transition:.2s;font-size:14px}
+#toast.on{opacity:1;transform:translateX(-50%)}
+
+@media (max-width:820px){
+  #nav{position:fixed;inset:0 auto 0 0;z-index:30;transform:translateX(-102%);transition:transform .2s;box-shadow:8px 0 30px rgba(0,0,0,.4)}
+  #nav.open{transform:none}
+  #members{position:fixed;inset:0 0 0 auto;z-index:30;transform:translateX(102%);transition:transform .2s;box-shadow:-8px 0 30px rgba(0,0,0,.4)}
+  #members.collapsed{display:block}
+  #members.open{transform:none}
+  #btnNav{display:grid}
+  #side{width:min(240px,calc(100vw - 72px))}
+  .msg{padding:2px 12px}
+  #composer{margin:0 10px calc(10px + env(safe-area-inset-bottom))}
+}
+</style>
+</head>
+<body>
+
+<!-- configuração do Supabase -->
+<div id="setup" class="screen hidden">
+  <form class="panel" id="setupForm">
+    <div class="logo">Z</div>
+    <h2>Conectar ao Supabase</h2>
+    <p class="sub">Falta só ligar o app ao seu banco de dados.</p>
+    <label class="f" for="cfgUrl">Project URL</label>
+    <input id="cfgUrl" type="url" placeholder="https://xxxx.supabase.co" autocomplete="off" required>
+    <label class="f" for="cfgKey">Chave pública (anon / publishable)</label>
+    <input id="cfgKey" type="text" placeholder="eyJ... ou sb_publishable_..." autocomplete="off" required>
+    <button class="btn primary block" type="submit">Salvar e continuar</button>
+    <ol class="help">
+      <li>Crie um projeto em supabase.com.</li>
+      <li>No <b>SQL Editor</b>, rode o arquivo <code>setup.sql</code>.</li>
+      <li>Em <b>Project Settings → API</b>, copie a URL e a chave pública para cá.</li>
+    </ol>
+  </form>
+</div>
+
+<!-- login / cadastro -->
+<div id="auth" class="screen hidden">
+  <form class="panel" id="authForm">
+    <div class="logo">Z</div>
+    <h2 id="authTitle">Bem-vindo de volta</h2>
+    <p class="sub" id="authSub">Entre para conversar com seus amigos.</p>
+    <div class="tabs">
+      <button type="button" id="tabIn" class="on">Entrar</button>
+      <button type="button" id="tabUp">Criar conta</button>
+    </div>
+    <div id="userWrap" class="hidden">
+      <label class="f" for="authUser">Nome de usuário</label>
+      <input id="authUser" type="text" maxlength="32" autocomplete="nickname">
+    </div>
+    <label class="f" for="authEmail">E-mail</label>
+    <input id="authEmail" type="email" autocomplete="email" required>
+    <label class="f" for="authPass">Senha</label>
+    <input id="authPass" type="password" minlength="6" autocomplete="current-password" required>
+    <div id="authMsg"></div>
+    <button class="btn primary block" id="authBtn" type="submit">Entrar</button>
+    <a class="link hidden" id="resetCfg" href="#">Trocar projeto Supabase</a>
+  </form>
+</div>
+
+<!-- aplicativo -->
+<div id="app" class="hidden home">
+  <div id="scrim"></div>
+  <nav id="nav">
+    <div id="rail"></div>
+    <aside id="side">
+      <header id="sideHead"></header>
+      <div id="sideList"></div>
+      <footer id="me"></footer>
+    </aside>
+  </nav>
+  <main id="main">
+    <header id="top">
+      <button class="icon" id="btnNav" title="Menu">☰</button>
+      <span id="chIcon"></span>
+      <h1 id="chName"></h1>
+      <span class="grow"></span>
+      <button class="icon" id="btnMembers" title="Membros">👥</button>
+    </header>
+    <div id="feed"><div id="msgs"></div></div>
+    <button id="jump" class="hidden">Novas mensagens ↓</button>
+    <div id="emojiPop" class="hidden"></div>
+    <form id="composer" class="hidden" autocomplete="off">
+      <button type="button" class="icon" id="btnEmoji" title="Emojis">😊</button>
+      <textarea id="input" rows="1" maxlength="2000" placeholder="Enviar mensagem"></textarea>
+      <button type="submit" id="btnSend" title="Enviar">➤</button>
+    </form>
+  </main>
+  <aside id="members"></aside>
+</div>
+
+<div id="modal" class="hidden"><div id="modalCard"></div></div>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+
+/* Opcional: preencha aqui para não precisar da tela de configuração. */
+const SUPABASE_URL = 'https://ruhgksjohdskerhzukcz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1aGdrc2pvaGRza2VyaHp1a2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NTUyMzksImV4cCI6MjEwNzQzMTIzOX0.ne7TnMPXBUMAJkVDA8sqd-ugbv-HwPR_RqqA2Tsb03I';
+
+const PAGE = 50;
+const COLORS = ['#6d7cff','#3ecf8e','#f0a23b','#e5658b','#4cc3e8','#a06cf0','#e26d5c','#59c9a5','#d0b341','#7e8aa8'];
+const EMOJIS = ['😀','😂','🥹','😍','😎','🤔','😅','😭','😡','👍','👎','🙏','👏','🔥','🎉','❤️','💀','🤝','👀','✨','🎮','🍕','☕','🚀','💡','✅','❌','😴','🤯','🥳'];
+
+const $ = (id) => document.getElementById(id);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k){ try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+const S = {
+  sb: null, me: null, profile: null, booting: false,
+  servers: [], dms: [], channels: [], members: [], msgs: [],
+  view: 'home', serverId: null, channelId: null,
+  profiles: new Map(), online: new Set(),
+  hasMore: false, sending: false, openToken: 0,
+  presence: null, mineCh: null, srvCh: null, msgCh: null
+};
+
+/* ---------- utilidades ---------- */
+function esc(s){
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+/* Mini-markdown seguro: escapa tudo primeiro e só então aplica formatação. */
+function fmt(raw){
+  let s = esc(raw);
+  const keep = [];
+  const stash = (html) => { keep.push(html); return '\u0000' + (keep.length - 1) + '\u0000'; };
+  s = s.replace(/```([\s\S]+?)```/g, (_, c) => stash('<pre><code>' + c.replace(/^\n/, '') + '</code></pre>'));
+  s = s.replace(/`([^`\n]+)`/g, (_, c) => stash('<code>' + c + '</code>'));
+  s = s.replace(/https?:\/\/[^\s\u0000]+?(?=(?:[.,!?;:)\]]|&quot;|&#39;|&gt;)*(?:\s|$|\u0000))/g, (u) => stash('<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>'));
+  s = s.replace(/\*\*([^\n]+?)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/(^|[^*])\*([^\s*](?:[^*\n]*[^\s*])?)\*(?!\*)/g, '$1<em>$2</em>');
+  s = s.replace(/~~([^\n]+?)~~/g, '<del>$1</del>');
+  return s.replace(/\u0000(\d+)\u0000/g, (_, i) => keep[+i]);
+}
+
+function h(tag, props, ...kids){
+  const el = document.createElement(tag);
+  if (props) for (const [k, v] of Object.entries(props)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'style') el.style.cssText = v;
+    else if (k === 'html') el.innerHTML = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) {
+    if (c == null || c === false) continue;
+    el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  return el;
+}
+
+const safeColor = (c) => (/^#[0-9a-f]{6}$/i.test(c || '') ? c : '#6d7cff');
+const firstChar = (s) => (Array.from((s || '?').trim())[0] || '?').toUpperCase();
+
+function avatar(p, opts){
+  opts = opts || {};
+  const el = h('div', { class: 'avatar' + (opts.sm ? ' sm' : ''), style: 'background:' + safeColor(p && p.color) }, firstChar(p && p.username));
+  if (opts.dot) el.append(h('span', { class: 'dot' + (S.online.has(p.id) ? ' on' : '') }));
+  return el;
+}
+
+async function q(promise){
+  const { data, error } = await promise;
+  if (error) throw error;
+  return data;
+}
+
+function errMsg(e){
+  const m = (e && e.message) || String(e);
+  const map = [
+    [/Invalid login credentials/i, 'E-mail ou senha incorretos.'],
+    [/User already registered/i, 'Este e-mail já está cadastrado.'],
+    [/Email not confirmed/i, 'Confirme seu e-mail antes de entrar (veja sua caixa de entrada).'],
+    [/at least 6/i, 'A senha precisa ter ao menos 6 caracteres.'],
+    [/invalid invite/i, 'Convite inválido.'],
+    [/no shared server/i, 'Só é possível conversar com quem está em um servidor com você.'],
+    [/rate limit|too many/i, 'Muitas tentativas. Aguarde um pouco e tente de novo.'],
+    [/Failed to fetch|NetworkError|Load failed/i, 'Sem conexão com o servidor. Verifique a internet e a configuração do Supabase.'],
+    [/row-level security|permission denied/i, 'Sem permissão para essa ação.'],
+    [/valid email|invalid format/i, 'E-mail inválido.']
+  ];
+  for (const [re, t] of map) if (re.test(m)) return t;
+  return m;
+}
+
+let toastTimer;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), 3600);
+}
+
+async function copyText(txt){
+  try { await navigator.clipboard.writeText(txt); toast('Copiado!'); return; } catch (e) {}
+  const ta = h('textarea', { style: 'position:fixed;opacity:0' }); ta.value = txt;
+  document.body.append(ta); ta.select();
+  try { document.execCommand('copy'); toast('Copiado!'); } catch (e) { toast('Não consegui copiar.'); }
+  ta.remove();
+}
+
+const hhmm = (iso) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+const fullTime = (iso) => new Date(iso).toLocaleString('pt-BR');
+const dayKey = (iso) => { const d = new Date(iso); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); };
+const fmtDay = (d) => d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+const mobile = () => window.matchMedia('(max-width:820px)').matches;
+const coarse = () => window.matchMedia('(pointer:coarse)').matches;
+const curServer = () => S.servers.find((s) => s.id === S.serverId);
+const isOwner = () => { const s = curServer(); return !!s && s.owner_id === S.me.id; };
+
+function showScreen(name){
+  for (const id of ['setup', 'auth', 'app']) $(id).classList.toggle('hidden', id !== name);
+}
+
+/* ---------- modal ---------- */
+function openModal(title, ...content){
+  $('modalCard').replaceChildren(h('h2', null, title), ...content);
+  $('modal').classList.remove('hidden');
+}
+function closeModal(){ $('modal').classList.add('hidden'); }
+const mbtn = (label, onClick, cls) => h('button', { class: 'btn ' + (cls || ''), type: 'button', onClick }, label);
+
+/* ---------- autenticação ---------- */
+let authMode = 'in';
+function setAuthMode(mode){
+  authMode = mode;
+  $('tabIn').classList.toggle('on', mode === 'in');
+  $('tabUp').classList.toggle('on', mode === 'up');
+  $('userWrap').classList.toggle('hidden', mode === 'in');
+  $('authUser').required = mode === 'up';
+  $('authPass').autocomplete = mode === 'in' ? 'current-password' : 'new-password';
+  $('authBtn').textContent = mode === 'in' ? 'Entrar' : 'Criar conta';
+  $('authTitle').textContent = mode === 'in' ? 'Bem-vindo de volta' : 'Crie sua conta';
+  $('authSub').textContent = mode === 'in' ? 'Entre para conversar com seus amigos.' : 'Leva menos de um minuto.';
+  $('authMsg').replaceChildren();
+}
+function authNote(text, ok){ $('authMsg').replaceChildren(h('div', { class: ok ? 'ok' : 'err' }, text)); }
+
+async function submitAuth(ev){
+  ev.preventDefault();
+  const email = $('authEmail').value.trim(), password = $('authPass').value;
+  const btn = $('authBtn'); btn.disabled = true; $('authMsg').replaceChildren();
+  try {
+    if (authMode === 'up') {
+      const username = $('authUser').value.trim();
+      if (username.length < 2) throw new Error('Escolha um nome de usuário com ao menos 2 caracteres.');
+      const { data, error } = await S.sb.auth.signUp({ email, password, options: { data: { username, color: pick(COLORS) } } });
+      if (error) throw error;
+      if (!data.session) { setAuthMode('in'); authNote('Conta criada! Confirme seu e-mail para poder entrar.', true); }
+    } else {
+      const { error } = await S.sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    }
+  } catch (e) { authNote(errMsg(e), false); }
+  btn.disabled = false;
+}
+
+/* ---------- inicialização ---------- */
+function start(){
+  const url = SUPABASE_URL || store.get('zuno.url');
+  const key = SUPABASE_ANON_KEY || store.get('zuno.key');
+  if (!url || !key) { showScreen('setup'); return; }
+  $('resetCfg').classList.toggle('hidden', !!(SUPABASE_URL && SUPABASE_ANON_KEY));
+  if (!window.supabase) {
+    showScreen('auth');
+    authNote('Não consegui carregar a biblioteca do Supabase. Verifique sua internet e recarregue.', false);
+    return;
+  }
+  S.sb = window.supabase.createClient(url, key);
+  const m = (location.hash || '').match(/convite=([A-Za-z0-9]+)/);
+  if (m) store.set('zuno.invite', m[1].toLowerCase());
+
+  S.sb.auth.onAuthStateChange((ev, session) => {
+    if (session && !S.me) { S.me = session.user; setTimeout(boot, 0); }
+    else if (!session && S.me) { setTimeout(teardown, 0); }
+    else if (!session && !S.me) { showScreen('auth'); }
+  });
+  S.sb.auth.getSession().then(({ data }) => {
+    if (data && data.session && !S.me) { S.me = data.session.user; setTimeout(boot, 0); }
+    else if (!(data && data.session) && !S.me) showScreen('auth');
+  });
+}
+
+async function boot(){
+  if (S.booting) return;
+  S.booting = true;
+  try {
+    let p = null;
+    for (let i = 0; i < 5 && !p; i++) {
+      const rows = await q(S.sb.from('dc_profiles').select('id,username,color').eq('id', S.me.id));
+      p = rows[0];
+      if (!p) await sleep(450);
+    }
+    if (!p) throw new Error('Perfil não encontrado. Você rodou o arquivo setup.sql no Supabase?');
+    S.profile = p; S.profiles.set(p.id, p);
+    renderMe();
+    showScreen('app');
+    startPresence();
+    await Promise.all([loadServers(), loadDMs()]);
+    subscribeMine();
+    const joined = await handlePendingInvite();
+    const last = joined || store.get('zuno.last');
+    if (last && S.servers.some((s) => s.id === last)) await selectServer(last);
+    else await goHome();
+  } catch (e) {
+    console.error(e);
+    const msg = errMsg(e);
+    for (const k of ['presence', 'mineCh', 'srvCh', 'msgCh']) { if (S[k]) { S.sb.removeChannel(S[k]); S[k] = null; } }
+    S.me = null;
+    try { await S.sb.auth.signOut(); } catch (e2) {}
+    showScreen('auth');
+    authNote(msg, false);
+  } finally { S.booting = false; }
+}
+
+function teardown(){
+  for (const k of ['presence', 'mineCh', 'srvCh', 'msgCh']) { if (S[k]) { S.sb.removeChannel(S[k]); S[k] = null; } }
+  Object.assign(S, { me: null, profile: null, servers: [], dms: [], channels: [], members: [], msgs: [], serverId: null, channelId: null, view: 'home' });
+  S.profiles.clear(); S.online = new Set();
+  closeDrawers(); closeModal();
+  showScreen('auth');
+}
+
+async function handlePendingInvite(){
+  const code = store.get('zuno.invite');
+  if (!code) return null;
+  store.del('zuno.invite');
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  try {
+    const sid = await q(S.sb.rpc('dc_join_server', { p_code: code }));
+    await loadServers();
+    toast('Você entrou no servidor!');
+    return sid;
+  } catch (e) { toast(errMsg(e)); return null; }
+}
+
+/* ---------- presença e tempo real ---------- */
+function startPresence(){
+  S.presence = S.sb.channel('zuno-online', { config: { presence: { key: S.me.id } } });
+  S.presence.on('presence', { event: 'sync' }, () => {
+    S.online = new Set(Object.keys(S.presence.presenceState()));
+    renderMembers(); renderSide(); renderMe();
+  }).subscribe(async (status) => {
+    if (status === 'SUBSCRIBED') await S.presence.track({ at: Date.now() });
+  });
+}
+
+function subscribeMine(){
+  const me = S.me.id;
+  S.mineCh = S.sb.channel('mine-' + me)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dc_members', filter: 'user_id=eq.' + me }, () => loadServers())
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'dc_members' }, async (p) => {
+      const old = p.old || {};
+      if (old.user_id !== me) return;
+      await loadServers();
+      if (S.serverId && !S.servers.some((s) => s.id === S.serverId)) { toast('Você não está mais nesse servidor.'); goHome(); }
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dc_dm_members', filter: 'user_id=eq.' + me }, () => loadDMs())
+    .subscribe();
+}
+
+function subscribeServer(sid){
+  S.srvCh = S.sb.channel('srv-' + sid + '-' + Date.now())
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dc_channels', filter: 'server_id=eq.' + sid }, () => reloadChannels())
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'dc_channels' }, (p) => {
+      if (p.old && S.channels.some((c) => c.id === p.old.id)) reloadChannels();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dc_members', filter: 'server_id=eq.' + sid }, () => loadMembers())
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'dc_members' }, (p) => {
+      const old = p.old || {};
+      if (old.server_id === S.serverId && old.user_id !== S.me.id) loadMembers();
+    })
+    .subscribe();
+}
+function unsubServer(){ if (S.srvCh) { S.sb.removeChannel(S.srvCh); S.srvCh = null; } }
+
+function subscribeMsgs(cid){
+  const f = 'channel_id=eq.' + cid;
+  S.msgCh = S.sb.channel('msgs-' + cid + '-' + Date.now())
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dc_messages', filter: f }, onMsgInsert)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'dc_messages', filter: f }, onMsgUpdate)
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'dc_messages' }, onMsgDelete)
+    .subscribe((status) => { if (status === 'SUBSCRIBED') catchUp(cid).catch(() => {}); });
+}
+function unsubMsgs(){ if (S.msgCh) { S.sb.removeChannel(S.msgCh); S.msgCh = null; } }
+
+/* ---------- dados ---------- */
+async function ensureProfiles(ids){
+  const need = [...new Set(ids)].filter((id) => id && !S.profiles.has(id));
+  if (!need.length) return;
+  const rows = await q(S.sb.from('dc_profiles').select('id,username,color').in('id', need));
+  rows.forEach((p) => S.profiles.set(p.id, p));
+}
+
+async function loadServers(){
+  const rows = await q(S.sb.from('dc_members').select('role,joined_at,dc_servers!server_id(id,name,invite_code,owner_id)').eq('user_id', S.me.id).order('joined_at'));
+  S.servers = rows.filter((r) => r.dc_servers).map((r) => Object.assign({}, r.dc_servers, { role: r.role }));
+  renderRail();
+}
+
+async function loadDMs(){
+  const mine = await q(S.sb.from('dc_dm_members').select('channel_id').eq('user_id', S.me.id));
+  const ids = mine.map((r) => r.channel_id);
+  if (!ids.length) { S.dms = []; renderSide(); return; }
+  const peers = await q(S.sb.from('dc_dm_members').select('channel_id,user_id,dc_profiles!user_id(id,username,color)').in('channel_id', ids).neq('user_id', S.me.id));
+  S.dms = peers.filter((r) => r.dc_profiles).map((r) => ({ channel_id: r.channel_id, peer: r.dc_profiles }));
+  S.dms.sort((a, b) => a.peer.username.localeCompare(b.peer.username));
+  S.dms.forEach((d) => S.profiles.set(d.peer.id, d.peer));
+  renderSide();
+}
+
+async function reloadChannels(){
+  const sid = S.serverId; if (!sid) return;
+  const rows = await q(S.sb.from('dc_channels').select('id,name,kind').eq('server_id', sid).order('created_at'));
+  if (sid !== S.serverId) return;
+  S.channels = rows;
+  renderSide();
+  if (S.channelId && !S.channels.some((c) => c.id === S.channelId)) {
+    if (S.channels[0]) openChannel(S.channels[0].id); else clearMain();
+  }
+}
+
+async function loadMembers(){
+  const sid = S.serverId; if (!sid) return;
+  const rows = await q(S.sb.from('dc_members').select('user_id,role,dc_profiles!user_id(id,username,color)').eq('server_id', sid));
+  if (sid !== S.serverId) return;
+  S.members = rows.filter((r) => r.dc_profiles).map((r) => Object.assign({}, r.dc_profiles, { role: r.role }));
+  S.members.forEach((m) => S.profiles.set(m.id, { id: m.id, username: m.username, color: m.color }));
+  renderMembers();
+}
+
+/* ---------- navegação ---------- */
+async function goHome(openCid){
+  S.view = 'home'; S.serverId = null; store.del('zuno.last');
+  unsubServer(); S.channels = []; S.members = [];
+  $('app').classList.add('home');
+  renderRail(); renderSide(); renderMembers();
+  if (openCid) await openChannel(openCid); else clearMain();
+}
+
+async function selectServer(id){
+  const srv = S.servers.find((s) => s.id === id);
+  if (!srv) return goHome();
+  S.view = 'server'; S.serverId = id; store.set('zuno.last', id);
+  $('app').classList.remove('home');
+  unsubServer();
+  try {
+    S.channels = await q(S.sb.from('dc_channels').select('id,name,kind').eq('server_id', id).order('created_at'));
+  } catch (e) { toast(errMsg(e)); S.channels = []; }
+  if (S.serverId !== id) return;
+  renderRail(); renderSide();
+  loadMembers().catch((e) => toast(errMsg(e)));
+  subscribeServer(id);
+  const remembered = store.get('zuno.ch.' + id);
+  const ch = S.channels.find((c) => c.id === remembered) || S.channels[0];
+  if (ch) await openChannel(ch.id); else clearMain();
+}
+
+function currentChannel(){
+  if (S.view === 'server') { const c = S.channels.find((x) => x.id === S.channelId); return c ? { kind: 'text', name: c.name } : null; }
+  const d = S.dms.find((x) => x.channel_id === S.channelId);
+  return d ? { kind: 'dm', name: d.peer.username } : null;
+}
+
+function clearMain(){
+  unsubMsgs();
+  S.channelId = null; S.msgs = []; S.hasMore = false;
+  $('composer').classList.add('hidden');
+  $('emojiPop').classList.add('hidden');
+  const welcome = S.view === 'home'
+    ? h('div', { class: 'empty' }, h('h3', null, 'Suas conversas'), h('div', null, S.dms.length ? 'Escolha uma conversa no menu.' : 'Entre em um servidor e toque em um membro para mandar uma mensagem direta.'))
+    : h('div', { class: 'empty' }, h('h3', null, 'Sem canais'), h('div', null, 'Este servidor ainda não tem canais.'));
+  $('msgs').replaceChildren(welcome);
+  renderTop(); renderSide();
+}
+
+async function openChannel(cid){
+  const token = ++S.openToken;
+  unsubMsgs();
+  S.channelId = cid; S.msgs = []; S.hasMore = false;
+  if (S.view === 'server') store.set('zuno.ch.' + S.serverId, cid);
+  renderSide(); renderTop();
+  $('composer').classList.remove('hidden');
+  $('jump').classList.add('hidden');
+  $('msgs').replaceChildren(h('div', { class: 'loading' }, 'Carregando…'));
+  closeDrawers();
+  let rows;
+  try {
+    rows = await q(S.sb.from('dc_messages').select('*').eq('channel_id', cid).order('id', { ascending: false }).limit(PAGE));
+    rows.reverse();
+    await ensureProfiles(rows.map((r) => r.user_id));
+  } catch (e) {
+    if (token === S.openToken) { toast(errMsg(e)); $('msgs').replaceChildren(h('div', { class: 'empty' }, 'Não foi possível carregar as mensagens.')); }
+    return;
+  }
+  if (token !== S.openToken) return;
+  S.msgs = rows; S.hasMore = rows.length === PAGE;
+  renderMsgs(true);
+  subscribeMsgs(cid);
+  if (!coarse()) $('input').focus();
+}
+
+async function loadOlder(){
+  const oldest = S.msgs[0]; if (!oldest) return;
+  const cid = S.channelId;
+  try {
+    const rows = await q(S.sb.from('dc_messages').select('*').eq('channel_id', cid).lt('id', oldest.id).order('id', { ascending: false }).limit(PAGE));
+    rows.reverse();
+    await ensureProfiles(rows.map((r) => r.user_id));
+    if (cid !== S.channelId) return;
+    const feed = $('feed'), before = feed.scrollHeight;
+    S.msgs = rows.concat(S.msgs); S.hasMore = rows.length === PAGE;
+    renderMsgs(false);
+    feed.scrollTop += feed.scrollHeight - before;
+  } catch (e) { toast(errMsg(e)); }
+}
+
+async function catchUp(cid){
+  if (cid !== S.channelId) return;
+  const last = S.msgs.length ? S.msgs[S.msgs.length - 1].id : 0;
+  const rows = await q(S.sb.from('dc_messages').select('*').eq('channel_id', cid).gt('id', last).order('id').limit(100));
+  if (cid !== S.channelId || !rows.length) return;
+  await ensureProfiles(rows.map((r) => r.user_id));
+  rows.forEach(appendMsg);
+}
+
+/* ---------- renderização ---------- */
+function renderMe(){
+  const p = S.profile; if (!p) return;
+  $('me').replaceChildren(
+    avatar(p, { sm: true, dot: true }),
+    h('div', { class: 'who' }, h('b', null, p.username), h('small', null, 'Online')),
+    h('button', { class: 'icon', title: 'Configurações', onClick: modalSettings }, '⚙')
+  );
+}
+
+function renderRail(){
+  const initials = (n) => n.trim().split(/\s+/).slice(0, 2).map(firstChar).join('');
+  $('rail').replaceChildren(
+    h('button', { class: 'rail-btn' + (S.view === 'home' ? ' active' : ''), title: 'Mensagens diretas', onClick: () => { goHome(); } }, '💬'),
+    h('div', { class: 'rail-sep' }),
+    ...S.servers.map((s) => h('button', {
+      class: 'rail-btn' + (S.view === 'server' && S.serverId === s.id ? ' active' : ''),
+      title: s.name, onClick: () => selectServer(s.id)
+    }, initials(s.name))),
+    h('button', { class: 'rail-btn add', title: 'Adicionar servidor', onClick: modalAddServer }, '+')
+  );
+}
+
+function renderSide(){
+  const head = $('sideHead'), list = $('sideList');
+  if (S.view === 'home') {
+    head.replaceChildren(h('span', null, 'Mensagens diretas'));
+    list.replaceChildren(
+      h('div', { class: 'sec' }, h('span', null, 'Conversas')),
+      ...(S.dms.length
+        ? S.dms.map((d) => h('div', { class: 'row' + (S.channelId === d.channel_id ? ' active' : ''), onClick: () => openChannel(d.channel_id) },
+            avatar(d.peer, { sm: true, dot: true }), h('span', { class: 'rn' }, d.peer.username)))
+        : [h('div', { class: 'empty-side' }, 'Nenhuma conversa ainda. Toque em um membro de um servidor para começar.')])
+    );
+    return;
+  }
+  const srv = curServer(); if (!srv) return;
+  head.replaceChildren(h('button', { id: 'srvBtn', onClick: modalServerMenu }, h('span', null, srv.name), h('span', null, '⌄')));
+  const owner = isOwner();
+  list.replaceChildren(
+    h('div', { class: 'sec' }, h('span', null, 'Canais de texto'), owner ? h('button', { title: 'Criar canal', onClick: modalCreateChannel }, '+') : null),
+    ...S.channels.map((c) => h('div', { class: 'row' + (S.channelId === c.id ? ' active' : ''), onClick: () => openChannel(c.id) },
+      h('span', { class: 'hash' }, '#'), h('span', { class: 'rn' }, c.name),
+      owner && S.channels.length > 1 ? h('button', { class: 'rowx', title: 'Excluir canal', onClick: (e) => { e.stopPropagation(); delChannel(c); } }, '×') : null))
+  );
+}
+
+function renderTop(){
+  const c = currentChannel();
+  $('chIcon').textContent = c ? (c.kind === 'dm' ? '@' : '#') : '';
+  $('chName').textContent = c ? c.name : (S.view === 'home' ? 'Mensagens diretas' : (curServer() ? curServer().name : ''));
+  $('input').placeholder = c ? (c.kind === 'dm' ? 'Mensagem para @' + c.name : 'Mensagem em #' + c.name) : 'Enviar mensagem';
+}
+
+function renderMembers(){
+  const box = $('members');
+  if (S.view !== 'server') { box.replaceChildren(); return; }
+  const on = S.members.filter((m) => S.online.has(m.id)), off = S.members.filter((m) => !S.online.has(m.id));
+  const row = (m) => h('div', { class: 'mrow' + (S.online.has(m.id) ? '' : ' off'), onClick: () => modalProfile(m) },
+    avatar(m, { sm: true, dot: true }),
+    h('span', { class: 'mn' }, m.username, m.id === S.me.id ? h('small', null, ' (você)') : null, m.role === 'owner' ? ' 👑' : null));
+  box.replaceChildren(
+    ...(on.length ? [h('div', { class: 'sec' }, h('span', null, 'Online — ' + on.length)), ...on.map(row)] : []),
+    ...(off.length ? [h('div', { class: 'sec' }, h('span', null, 'Offline — ' + off.length)), ...off.map(row)] : [])
+  );
+}
+
+/* ---------- mensagens ---------- */
+function emptyChannel(){
+  const c = currentChannel(); if (!c) return null;
+  return h('div', { class: 'empty' },
+    h('h3', null, c.kind === 'dm' ? 'Conversa com @' + c.name : 'Bem-vindo a #' + c.name),
+    h('div', null, 'Ainda não há mensagens. Escreva a primeira!'));
+}
+
+function msgNodes(m, prev){
+  const nodes = [];
+  const sameDay = prev && dayKey(prev.created_at) === dayKey(m.created_at);
+  if (!sameDay) nodes.push(h('div', { class: 'daysep' }, h('span', null, fmtDay(new Date(m.created_at)))));
+  const cont = !!(prev && sameDay && prev.user_id === m.user_id && (new Date(m.created_at) - new Date(prev.created_at)) < 5 * 60 * 1000);
+  nodes.push(msgEl(m, cont));
+  return nodes;
+}
+
+function msgEl(m, cont){
+  const p = S.profiles.get(m.user_id) || { id: m.user_id, username: 'Usuário', color: '#7e8aa8' };
+  const mine = m.user_id === S.me.id;
+  const canDel = mine || (S.view === 'server' && isOwner());
+  const text = h('div', { class: 'text', html: fmt(m.content) });
+  if (m.edited_at) text.append(h('span', { class: 'edited' }, ' (editada)'));
+  const el = h('div', { class: 'msg' + (cont ? ' cont' : ''), 'data-id': m.id },
+    cont ? h('time', { class: 'gutter-time', title: fullTime(m.created_at) }, hhmm(m.created_at)) : avatar(p),
+    h('div', { class: 'body' },
+      cont ? null : h('div', { class: 'meta' },
+        h('span', { class: 'name', style: 'color:' + safeColor(p.color) }, p.username),
+        h('time', { title: fullTime(m.created_at) }, hhmm(m.created_at))),
+      text),
+    (mine || canDel) ? h('div', { class: 'actions' },
+      mine ? h('button', { title: 'Editar', onClick: () => editMsg(m.id) }, '✎') : null,
+      canDel ? h('button', { title: 'Excluir', onClick: () => delMsg(m.id) }, '🗑') : null) : null
+  );
+  el.addEventListener('click', (e) => {
+    if (e.target.closest('a,button,textarea')) return;
+    document.querySelectorAll('.msg.sel').forEach((x) => { if (x !== el) x.classList.remove('sel'); });
+    el.classList.toggle('sel');
+  });
+  return el;
+}
+
+function renderMsgs(toBottom){
+  if (!S.channelId) return;
+  const frag = document.createDocumentFragment();
+  if (S.hasMore) frag.append(h('button', { class: 'more', type: 'button', onClick: loadOlder }, 'Carregar mensagens anteriores'));
+  if (!S.msgs.length) { const e = emptyChannel(); if (e) frag.append(e); }
+  S.msgs.forEach((m, i) => msgNodes(m, S.msgs[i - 1]).forEach((n) => frag.append(n)));
+  const feed = $('feed'), top = feed.scrollTop;
+  $('msgs').replaceChildren(frag);
+  if (toBottom) scrollBottom(); else feed.scrollTop = top;
+}
+
+const atBottom = () => { const f = $('feed'); return f.scrollHeight - f.scrollTop - f.clientHeight < 90; };
+function scrollBottom(){ requestAnimationFrame(() => { const f = $('feed'); f.scrollTop = f.scrollHeight; $('jump').classList.add('hidden'); }); }
+
+function appendMsg(m){
+  if (m.channel_id !== S.channelId || S.msgs.some((x) => x.id === m.id)) return;
+  const prev = S.msgs[S.msgs.length - 1];
+  const stick = atBottom() || m.user_id === S.me.id;
+  S.msgs.push(m);
+  const box = $('msgs');
+  box.querySelectorAll('.empty,.loading').forEach((n) => n.remove());
+  msgNodes(m, prev).forEach((n) => box.append(n));
+  if (stick) scrollBottom(); else $('jump').classList.remove('hidden');
+}
+
+async function onMsgInsert(p){
+  const m = p.new; if (!m || m.channel_id !== S.channelId) return;
+  try { await ensureProfiles([m.user_id]); } catch (e) {}
+  appendMsg(m);
+}
+function onMsgUpdate(p){
+  const m = p.new; if (!m) return;
+  const i = S.msgs.findIndex((x) => x.id === m.id); if (i < 0) return;
+  S.msgs[i] = Object.assign({}, S.msgs[i], m);
+  renderMsgs(false);
+}
+function onMsgDelete(p){
+  const id = p.old && p.old.id;
+  const i = S.msgs.findIndex((x) => x.id === id); if (i < 0) return;
+  S.msgs.splice(i, 1);
+  renderMsgs(false);
+}
+
+async function send(){
+  const input = $('input');
+  const text = input.value.replace(/\s+$/, '');
+  if (!text.trim() || !S.channelId || S.sending) return;
+  S.sending = true;
+  input.value = ''; autosize();
+  $('emojiPop').classList.add('hidden');
+  const cid = S.channelId;
+  try {
+    const row = await q(S.sb.from('dc_messages').insert({ channel_id: cid, user_id: S.me.id, content: text }).select().single());
+    appendMsg(row);
+  } catch (e) {
+    if (!input.value) { input.value = text; autosize(); }
+    toast('Não foi possível enviar: ' + errMsg(e));
+  } finally { S.sending = false; }
+}
+
+function editMsg(id){
+  const m = S.msgs.find((x) => x.id === id);
+  const box = document.querySelector('.msg[data-id="' + id + '"] .text');
+  if (!m || !box) return;
+  const ta = h('textarea', { class: 'edit', maxlength: '2000' }); ta.value = m.content;
+  const cancel = () => renderMsgs(false);
+  const save = async () => {
+    const v = ta.value.trim();
+    if (!v || v === m.content) return cancel();
+    try {
+      const row = await q(S.sb.from('dc_messages').update({ content: v, edited_at: new Date().toISOString() }).eq('id', id).select().single());
+      Object.assign(m, row);
+    } catch (e) { toast('Não foi possível editar: ' + errMsg(e)); }
+    renderMsgs(false);
+  };
+  ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !coarse()) { e.preventDefault(); save(); }
+    else if (e.key === 'Escape') cancel();
+  });
+  box.replaceChildren(ta, h('div', { class: 'edit-bar' }, mbtn('Salvar', save, 'primary'), mbtn('Cancelar', cancel)));
+  ta.focus();
+}
+
+async function delMsg(id){
+  if (!confirm('Excluir esta mensagem?')) return;
+  try {
+    await q(S.sb.from('dc_messages').delete().eq('id', id));
+    onMsgDelete({ old: { id } });
+  } catch (e) { toast(errMsg(e)); }
+}
+
+function autosize(){
+  const ta = $('input');
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
+}
+
+/* ---------- modais ---------- */
+function modalAddServer(){
+  const name = h('input', { placeholder: 'Ex.: Galera do jogo', maxlength: '50' });
+  const code = h('input', { placeholder: 'Código ou link do convite' });
+  const create = async () => {
+    const n = name.value.trim(); if (!n) return toast('Dê um nome ao servidor.');
+    try {
+      const sid = await q(S.sb.rpc('dc_create_server', { p_name: n }));
+      await loadServers(); closeModal(); await selectServer(sid);
+    } catch (e) { toast(errMsg(e)); }
+  };
+  const join = async () => {
+    let c = code.value.trim(); const m = c.match(/convite=([A-Za-z0-9]+)/); if (m) c = m[1];
+    if (!c) return toast('Cole o código do convite.');
+    try {
+      const sid = await q(S.sb.rpc('dc_join_server', { p_code: c }));
+      await loadServers(); closeModal(); await selectServer(sid);
+    } catch (e) { toast(errMsg(e)); }
+  };
+  openModal('Adicionar servidor',
+    h('h3', null, 'Criar um servidor'), name, h('div', { class: 'line' }, mbtn('Criar servidor', create, 'primary')),
+    h('div', { class: 'or' }, '— ou —'),
+    h('h3', null, 'Entrar com um convite'), code, h('div', { class: 'line' }, mbtn('Entrar', join)));
+}
+
+function modalServerMenu(){
+  const srv = curServer(); if (!srv) return;
+  const link = location.origin + location.pathname + '#convite=' + srv.invite_code;
+  const body = [
+    h('h3', null, 'Convidar amigos'),
+    h('div', { class: 'line' }, h('input', { readonly: true, value: link, onFocus: (e) => e.target.select() }), mbtn('Copiar', () => copyText(link), 'primary')),
+    h('div', { class: 'edited', style: 'margin-top:6px' }, 'Código: ' + srv.invite_code)
+  ];
+  if (isOwner()) {
+    body.push(h('div', { class: 'stack' },
+      mbtn('Criar canal', () => { closeModal(); modalCreateChannel(); }),
+      mbtn('Excluir servidor', async () => {
+        if (!confirm('Excluir "' + srv.name + '" para todos? Isso apaga canais e mensagens.')) return;
+        try { await q(S.sb.from('dc_servers').delete().eq('id', srv.id)); closeModal(); await loadServers(); goHome(); toast('Servidor excluído.'); }
+        catch (e) { toast(errMsg(e)); }
+      }, 'danger')));
+  } else {
+    body.push(h('div', { class: 'stack' }, mbtn('Sair do servidor', async () => {
+      if (!confirm('Sair de "' + srv.name + '"?')) return;
+      try { await q(S.sb.from('dc_members').delete().eq('server_id', srv.id).eq('user_id', S.me.id)); closeModal(); await loadServers(); goHome(); }
+      catch (e) { toast(errMsg(e)); }
+    }, 'danger')));
+  }
+  openModal(srv.name, ...body);
+}
+
+function modalCreateChannel(){
+  const name = h('input', { placeholder: 'novo-canal', maxlength: '40' });
+  const go = async () => {
+    const n = name.value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9à-ü_-]/g, '');
+    if (!n) return toast('Use letras, números ou hífen.');
+    try {
+      const row = await q(S.sb.from('dc_channels').insert({ server_id: S.serverId, kind: 'text', name: n }).select('id').single());
+      closeModal(); await reloadChannels(); await openChannel(row.id);
+    } catch (e) { toast(errMsg(e)); }
+  };
+  name.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+  openModal('Criar canal', h('h3', null, 'Nome do canal'), name, h('div', { class: 'line' }, mbtn('Criar', go, 'primary')));
+  setTimeout(() => name.focus(), 30);
+}
+
+async function delChannel(c){
+  if (!confirm('Excluir o canal #' + c.name + ' e todas as mensagens dele?')) return;
+  try { await q(S.sb.from('dc_channels').delete().eq('id', c.id)); await reloadChannels(); }
+  catch (e) { toast(errMsg(e)); }
+}
+
+function modalProfile(m){
+  const body = [
+    h('div', { class: 'center' }, avatar(m, { dot: true }),
+      h('b', null, m.username), h('div', { class: 'edited' }, (S.online.has(m.id) ? 'Online' : 'Offline') + (m.role === 'owner' ? ' · Dono do servidor' : '')))
+  ];
+  if (m.id !== S.me.id) {
+    body.push(h('div', { class: 'stack' }, mbtn('Enviar mensagem', async () => {
+      try { const cid = await q(S.sb.rpc('dc_open_dm', { p_other: m.id })); await loadDMs(); closeModal(); await goHome(cid); }
+      catch (e) { toast(errMsg(e)); }
+    }, 'primary')));
+  }
+  openModal('Perfil', ...body);
+}
+
+function modalSettings(){
+  const p = S.profile; let color = safeColor(p.color);
+  const name = h('input', { value: p.username, maxlength: '32' });
+  const sw = h('div', { class: 'swatches' });
+  const paint = () => sw.replaceChildren(...COLORS.map((c) => h('button', { type: 'button', class: 'sw' + (c === color ? ' on' : ''), style: 'background:' + c, onClick: () => { color = c; paint(); } })));
+  paint();
+  const save = async () => {
+    const n = name.value.trim(); if (n.length < 2) return toast('O nome precisa de ao menos 2 caracteres.');
+    try {
+      const row = await q(S.sb.from('dc_profiles').update({ username: n, color }).eq('id', S.me.id).select('id,username,color').single());
+      S.profile = row; S.profiles.set(row.id, row);
+      const mm = S.members.find((x) => x.id === row.id); if (mm) Object.assign(mm, row);
+      renderMe(); renderMembers(); renderMsgs(false); closeModal(); toast('Perfil atualizado.');
+    } catch (e) { toast(errMsg(e)); }
+  };
+  openModal('Configurações',
+    h('h3', null, 'Nome de usuário'), name,
+    h('h3', null, 'Cor do avatar'), sw,
+    h('div', { class: 'stack' }, mbtn('Salvar', save, 'primary'), mbtn('Sair da conta', async () => { closeModal(); await S.sb.auth.signOut(); }, 'danger')));
+}
+
+/* ---------- gavetas (celular) ---------- */
+function closeDrawers(){
+  $('nav').classList.remove('open'); $('members').classList.remove('open'); $('scrim').classList.remove('on');
+}
+
+/* ---------- eventos ---------- */
+function wireUI(){
+  $('setupForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const url = $('cfgUrl').value.trim().replace(/\/+$/, ''), key = $('cfgKey').value.trim();
+    if (!/^https?:\/\//.test(url)) return toast('A URL precisa começar com https://');
+    store.set('zuno.url', url); store.set('zuno.key', key);
+    location.reload();
+  });
+  $('resetCfg').addEventListener('click', (e) => { e.preventDefault(); store.del('zuno.url'); store.del('zuno.key'); location.reload(); });
+  $('tabIn').addEventListener('click', () => setAuthMode('in'));
+  $('tabUp').addEventListener('click', () => setAuthMode('up'));
+  $('authForm').addEventListener('submit', submitAuth);
+
+  $('btnNav').addEventListener('click', () => { $('nav').classList.add('open'); $('scrim').classList.add('on'); });
+  $('btnMembers').addEventListener('click', () => {
+    if (mobile()) { const mem = $('members'); mem.classList.toggle('open'); $('scrim').classList.toggle('on', mem.classList.contains('open')); }
+    else $('members').classList.toggle('collapsed');
+  });
+  $('scrim').addEventListener('click', closeDrawers);
+  $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  $('composer').addEventListener('submit', (e) => { e.preventDefault(); send(); });
+  const input = $('input');
+  input.addEventListener('input', autosize);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !coarse()) { e.preventDefault(); send(); }
+  });
+
+  const pop = $('emojiPop');
+  pop.replaceChildren(...EMOJIS.map((em) => h('button', { type: 'button', onClick: () => {
+    const s = input.selectionStart == null ? input.value.length : input.selectionStart, t = input.selectionEnd == null ? s : input.selectionEnd;
+    input.value = input.value.slice(0, s) + em + input.value.slice(t);
+    input.focus(); input.setSelectionRange(s + em.length, s + em.length); autosize();
+  } }, em)));
+  $('btnEmoji').addEventListener('click', (e) => { e.stopPropagation(); pop.classList.toggle('hidden'); });
+  document.addEventListener('click', (e) => { if (!pop.contains(e.target)) pop.classList.add('hidden'); });
+
+  $('feed').addEventListener('scroll', () => { if (atBottom()) $('jump').classList.add('hidden'); });
+  $('jump').addEventListener('click', scrollBottom);
+}
+
+wireUI();
+start();
+</script>
+</body>
+</html>
